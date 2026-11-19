@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alvan Chui</title>
+<meta name="description" content="Alvan Chui, data science student at the University of Washington, Seattle. Machine-learning research and autonomous robotics.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE  personal site for professors and recruiters: confident, technical, calm
+   IDEA   an atlas plate of a search: the rescue maze a robot explores, read like a data figure
+   PICTURE a live breadth-first search spreading through a rescue maze to the victim, shortest route drawn in pink
+   COLOUR deep sea #0a2540 ground in both themes, sky #8fd3ff for explored data, white ink, signal pink #ff5c8a for results
+   TYPE   Hanken Grotesk 300 very large for the name, Hanken Grotesk 400/600 for text
+   LAYOUT laptop: name and intro across the top, maze full width beneath; phone: name, maze, buttons, then sections stacked */
+:root{color-scheme:dark;--bg:#0a2540;--panel:#0f3157;--line:#24507d;--ink:#ffffff;--soft:#c3d6ea;--sky:#8fd3ff;--pink:#ff5c8a}
+:root[data-theme=light],:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:72px;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:clip}
+a{color:var(--sky)}
+a:focus-visible,button:focus-visible{outline:3px solid var(--pink);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1240px;margin:0 auto}
+.band{padding-block:clamp(36px,5vw,72px);padding-left:max(5vw,16px);padding-right:max(5vw,16px)}
+h1,h2,h3{margin:0;line-height:1.05;letter-spacing:-.02em;text-wrap:balance}
+h2{font-size:clamp(30px,4vw,44px);font-weight:600;margin-bottom:12px}
+h3{font-size:22px;font-weight:600;line-height:1.2}
+p{margin:0 0 14px;max-width:68ch}
+.soft{color:var(--soft)}
+.small{font-size:14px;color:var(--soft)}
+
+/* nav */
+nav{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:18px;padding:10px max(5vw,16px);flex-wrap:wrap}
+nav .me{font-weight:700;color:var(--ink);text-decoration:none;margin-right:auto;font-size:18px}
+nav ul{display:flex;gap:4px;list-style:none;margin:0;padding:0;flex-wrap:wrap}
+nav ul a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;color:var(--soft);text-decoration:none;border-radius:6px}
+nav ul a:hover{color:var(--ink);background:var(--panel)}
+
+/* hero */
+.hero{padding-bottom:28px}
+.hero h1{font-weight:300;font-size:clamp(52px,9vw,112px);letter-spacing:-.04em;line-height:.95}
+.intro{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px 48px;align-items:end;margin-top:18px}
+.lede{font-size:clamp(19px,2vw,23px);line-height:1.45;margin:0}
+.lede b{font-weight:600}
+.btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
+.btn{display:inline-flex;align-items:center;min-height:46px;padding:0 20px;border-radius:999px;font-weight:600;text-decoration:none;border:1.5px solid var(--sky);color:var(--sky);font-size:16px;background:none;cursor:pointer;font-family:inherit}
+.btn.main{background:var(--pink);border-color:var(--pink);color:#2a0612}
+.btn:hover{filter:brightness(1.12)}
+.mazeband{padding-top:0}
+.fig{position:relative;height:clamp(300px,38vw,440px);border-radius:14px;background:#08203a;border:1px solid var(--line);overflow:hidden}
+.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:12px;font-size:14px;color:var(--soft);align-items:center}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;margin-right:7px;vertical-align:-2px}
+.legend .cap{margin-left:auto}
+
+/* highlights */
+.hl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.hl div{padding:22px 24px 22px 0}
+.hl div+div{padding-left:24px;border-left:1px solid var(--line)}
+.hl strong{display:block;font-size:clamp(28px,3.2vw,40px);font-weight:300;letter-spacing:-.02em;color:var(--pink);line-height:1.1}
+.hl span{display:block;margin-top:6px;color:var(--soft);font-size:15px;line-height:1.4}
+
+/* sections */
+.alt{background:var(--panel)}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px 56px;align-items:start}
+.meta{display:flex;flex-wrap:wrap;gap:6px 10px;margin:10px 0 16px}
+.tag{font-size:14px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--soft)}
+.tag.hot{border-color:var(--pink);color:var(--ink)}
+ul.pts{margin:0 0 14px;padding-left:20px}
+ul.pts li{margin-bottom:6px;max-width:66ch}
+.fv{position:relative;height:320px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
+.fv>svg{position:absolute;inset:0;width:100%;height:100%}
+.classes{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px;margin-top:12px}
+.classes i{height:26px;border-radius:4px;background:var(--line)}
+.classes i:first-child{background:var(--sky)}
+.cl-key{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:var(--soft);margin-top:6px}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:26px}
+.card{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:24px}
+.card .role{color:var(--sky);font-size:15px;margin:4px 0 0}
+.result{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;border-top:1px solid var(--line);padding-top:12px;margin-top:6px}
+.result b{color:var(--pink);font-weight:600;white-space:nowrap}
+.sub{margin-top:36px}
+
+/* about + resume */
+.skills{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:8px 18px;margin:0}
+.skills dt{color:var(--soft);font-size:15px;padding-top:2px}
+.skills dd{margin:0}
+details{border-top:1px solid var(--line);padding:12px 0}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:600;min-height:32px;display:flex;align-items:center}
+summary::marker{color:var(--pink)}
+details ul{margin:10px 0 4px;padding-left:20px}
+details li{margin-bottom:5px}
+.tl{list-style:none;margin:8px 0 0;padding:0}
+.tl li{display:grid;grid-template-columns:7.5em minmax(0,1fr);gap:16px;padding:14px 0;border-top:1px solid var(--line)}
+.tl time{color:var(--sky);font-variant-numeric:tabular-nums;white-space:nowrap;font-size:15px;padding-top:2px}
+.tl b{font-weight:600}
+.tl span{display:block;color:var(--soft);font-size:15px}
+
+/* contact */
+.contact{background:var(--pink);color:#2a0612}
+.contact h2{font-weight:300;font-size:clamp(36px,5vw,60px)}
+.contact p{color:#3d0a1b}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;align-items:center}
+.contact .btn{border-color:#2a0612;color:#2a0612}
+.contact .btn.main{background:#2a0612;color:#fff}
+.mail{font-size:clamp(20px,2.4vw,26px);font-weight:600;overflow-wrap:anywhere}
+.contact .small{color:#4a1023;margin-top:18px}
+footer{padding:22px max(5vw,16px);font-size:14px;color:var(--soft)}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+@media(max-width:860px){
+.intro,.two{grid-template-columns:minmax(0,1fr)}
+.btns{justify-content:flex-start}
+.cards{grid-template-columns:minmax(0,1fr)}
+.legend .cap{margin-left:0;flex-basis:100%}
+}
+@media(max-width:600px){
+nav ul{width:100%;overflow-x:auto;flex-wrap:nowrap}
+nav ul li{flex:none}
+.hl{grid-template-columns:minmax(0,1fr)}
+.hl div,.hl div+div{padding:16px 0;border-left:0}
+.hl div+div{border-top:1px solid var(--line)}
+.tl li{grid-template-columns:minmax(0,1fr);gap:2px}
+.skills{grid-template-columns:minmax(0,1fr);gap:2px}
+.skills dd{margin-bottom:10px}
+.fv{height:260px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<nav aria-label="Main">
+  <div class="wrap">
+    <a class="me" href="#top">Alvan Chui</a>
+    <ul>
+      <li><a href="#research">Research</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#resume">Resume</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header id="top" class="band hero">
+  <div class="wrap">
+    <h1>Alvan Chui</h1>
+    <div class="intro">
+      <p class="lede">Data science student at the <b>University of Washington, Seattle</b>. I use data and machine learning on real problems, from checking the quality of lung-function tests to guiding autonomous rescue robots through a maze.</p>
+      <div class="btns">
+        <a class="btn main" href="#projects">View projects</a>
+        <a class="btn" href="#resume">Resume</a>
+        <a class="btn" href="#contact">Contact</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="band mazeband" aria-label="Breadth-first search animation">
+  <div class="wrap">
+    <div class="fig" id="maze" role="img" aria-label="A grid maze. Breadth-first search spreads outward from the robot's start cell until it reaches the victim, then the shortest route is drawn."><svg></svg></div>
+    <div class="legend">
+      <span><i style="background:#fff"></i>Robot start</span>
+      <span><i style="background:var(--sky)"></i>Cells explored by breadth-first search</span>
+      <span><i style="background:var(--pink)"></i>Shortest route to the victim</span>
+      <span class="cap">The search logic my rescue robot used at maze intersections</span>
+    </div>
+  </div>
+</section>
+
+<section class="band" style="padding-top:8px" aria-label="Highlights">
+  <div class="wrap hl">
+    <div><strong>3rd place</strong><span>RoboCup Junior World Championship 2024, Super Team, Eindhoven</span></div>
+    <div><strong>Top 4%</strong><span>First Prize, Shanghai Joint Secondary School Mathematical Modeling Competition 2024</span></div>
+    <div><strong>Co-author</strong><span>Machine-learning research with the First Affiliated Hospital of Guangzhou Medical University</span></div>
+  </div>
+</section>
+
+<section id="research" class="band alt">
+  <div class="wrap">
+    <h2>Research</h2>
+    <div class="two">
+      <div>
+        <h3>Wavelet and machine-learning method for rapid quality analysis of pulmonary function tests</h3>
+        <div class="meta"><span class="tag hot">Co-author</span><span class="tag">2024 to present</span><span class="tag">First Affiliated Hospital of Guangzhou Medical University</span></div>
+        <p>General practitioners need to know whether a spirometry test was performed well before they trust its numbers. We built a fast model that checks this automatically.</p>
+        <ul class="pts">
+          <li>Combined wavelet analysis with an artificial neural network, using both the flow-volume curve and the numerical values from each spirometer report.</li>
+          <li>Classified reports against the ATS/ERS 2019 standards into one qualified class and eight anomaly classes.</li>
+          <li>Validated the model on a held-out test set so it can flag quality problems for clinicians automatically.</li>
+          <li>Co-wrote a 4,000-word article, submitted to <i>Medical &amp; Biological Engineering &amp; Computing</i>.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="fv" id="fv" role="img" aria-label="Schematic flow-volume curve: flow rises sharply to a peak, then declines as volume is exhaled, followed by the inspiratory loop below the axis."><svg></svg></div>
+        <div class="classes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="cl-key"><span>1 qualified class</span><span>8 anomaly classes</span></div>
+        <p class="small" style="margin-top:8px">Schematic of the input the model reads, not study data.</p>
+      </div>
+    </div>
+
+    <div class="sub">
+      <h3>Secure dissemination of rescue information</h3>
+      <div class="meta"><span class="tag hot">Independent researcher</span><span class="tag">2022 to 2023</span><span class="tag">IEPQ, Oxford AQA</span><span class="tag">Grade A*</span></div>
+      <p>Studied how rescue information can be spread reliably and securely in emergencies, building and comparing dissemination models for complex emergency settings. The findings fed directly into how my rescue robot handled information. Written up as a 4,500-word paper.</p>
+    </div>
+  </div>
+</section>
+
+<section id="projects" class="band">
+  <div class="wrap">
+    <h2>Projects</h2>
+    <p class="soft">Each one started with a concrete problem and ended with a tested result.</p>
+    <div class="cards">
+      <article class="card">
+        <h3>Autonomous rescue robot</h3>
+        <p class="role">Hardware engineer, designer and competition strategist · 2022 to 2024</p>
+        <p style="margin-top:14px">A robot that explores a rescue maze on its own, recognises victims and delivers medical kits.</p>
+        <ul class="pts">
+          <li>Computer vision with two vision-recognition modules and 360-degree panoramic cameras to read visual cues in the maze.</li>
+          <li>Breadth-first search at intersections to guarantee full maze coverage.</li>
+          <li>PID control for stable line tracking and obstacle navigation.</li>
+          <li>3D-designed and printed kit-delivery system, touch-sensitive shields and a fishnet-style arm, kept light for speed.</li>
+        </ul>
+        <div class="result"><b>3rd, World 2024</b><span class="soft">RoboCup Junior World Championship, Super Team. Also 2nd at RoboCup Junior China 2024.</span></div>
+      </article>
+      <article class="card">
+        <h3>Faster aircraft boarding</h3>
+        <p class="role">Team leader, International Mathematical Modeling Challenge · 2022 to 2023</p>
+        <p style="margin-top:14px">How should an airline board and unload passengers to save the most time?</p>
+        <ul class="pts">
+          <li>Built a boarding and disembarking model and tested it on different boarding methods and passenger behaviours.</li>
+          <li>Analysed scenarios with standard deviation, z-scores, t-statistics, covariance and Chebyshev's inequality.</li>
+          <li>Used decision trees, Python and Pandas to simulate and visualise the results.</li>
+          <li>Modelled real-world friction such as carry-on bags and passengers who don't follow instructions.</li>
+        </ul>
+        <div class="result"><b>2nd Prize</b><span class="soft">IMMC country round, 2022.</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="about" class="band alt">
+  <div class="wrap two">
+    <div>
+      <h2>About</h2>
+      <p>I grew up in Macau and spent most of high school in the robotics lab at Pui Ching Middle School, where I also led weekly technical sessions for younger club members. Competing in robotics and mathematical modeling taught me to start from data, test every idea and explain the result clearly.</p>
+      <p>At the University of Washington I'm studying data science. I'm looking for research and internship opportunities in machine learning, applied statistics and data-driven robotics.</p>
+      <p>Outside work: basketball, swimming, snowboarding and drawing. I also volunteer with the Red Cross.</p>
+    </div>
+    <div>
+      <h3 style="margin-bottom:14px">Skills</h3>
+      <dl class="skills">
+        <dt>Data and ML</dt><dd>Python, Pandas, neural networks, wavelet analysis, decision trees</dd>
+        <dt>Statistics</dt><dd>Hypothesis testing, z-scores, covariance, simulation and modeling</dd>
+        <dt>Robotics</dt><dd>Computer vision, graph search, PID control, sensor integration</dd>
+        <dt>Tools</dt><dd>LaTeX, Excel (Microsoft Office Specialist), Onshape, CorelDRAW, Illustrator, Inkscape</dd>
+        <dt>Languages</dt><dd>English (fluent), Mandarin and Cantonese (native)</dd>
+      </dl>
+      <div style="margin-top:22px">
+        <details>
+          <summary>All competition results</summary>
+          <ul>
+            <li>RoboCup Junior World Championship, 3rd place, Super Team, Eindhoven (2024)</li>
+            <li>RoboCup Junior China Championship, 2nd place, Quanzhou (2024)</li>
+            <li>Shanghai Joint Secondary School Mathematical Modeling Competition, First Prize, top 4% (2024)</li>
+            <li>World Educational Robot Contest, First Prize, 4th place, international round (2023)</li>
+            <li>RoboCup Junior China Open, Second Prize, Quanzhou (2023)</li>
+            <li>World Robot Olympiad, First Prize, country round (2023 and 2022)</li>
+            <li>World Robotics Challenge, Second Prize, international round (2023)</li>
+            <li>Robotics Innovation Challenge, First Prize, country round (2023)</li>
+            <li>Macau Student Science Satellite Competition, Third Prize (2023)</li>
+            <li>International Mathematical Modeling Challenge, Second Prize, country round (2022)</li>
+          </ul>
+        </details>
+        <details>
+          <summary>Awards and certificates</summary>
+          <ul>
+            <li>Red and Blue Light Award (2024)</li>
+            <li>Service Award (2022, 2024)</li>
+            <li>English Reading Award (2021, 2022)</li>
+            <li>Microsoft Office Specialist, Excel 2019 Associate</li>
+            <li>2021 Zero Carbon Citizen</li>
+            <li>Campus Police Star Youth Program, Macau Security Forces Superior School (2021)</li>
+          </ul>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="resume" class="band">
+  <div class="wrap two">
+    <div>
+      <h2>Resume</h2>
+      <p class="soft">The short version. A full PDF is available on request.</p>
+      <ol class="tl">
+        <li><time>Now</time><div><b>Data Science, University of Washington</b><span>Seattle</span></div></li>
+        <li><time>2024 to now</time><div><b>Co-author, spirometry ML research</b><span>First Affiliated Hospital of Guangzhou Medical University</span></div></li>
+        <li><time>2023</time><div><b>UCLA Summer Session</b><span>Communication: Ethical and Policy Dimensions of Mass Media, GPA 4.0</span></div></li>
+        <li><time>2022 to 2024</time><div><b>Rescue Robotics</b><span>Hardware engineer, designer and competition strategist</span></div></li>
+      </ol>
+    </div>
+    <div>
+      <ol class="tl" style="margin-top:0">
+        <li><time>2022 to 2023</time><div><b>International Mathematical Modeling Challenge</b><span>Researcher and team leader</span></div></li>
+        <li><time>2022 to 2023</time><div><b>IEPQ, Oxford AQA</b><span>Independent researcher, A* paper</span></div></li>
+        <li><time>2020 to 2025</time><div><b>Integrated Robot Club, FabLab</b><span>Led weekly technical sessions for junior members</span></div></li>
+        <li><time>2023 to now</time><div><b>Red Cross Volunteer Team</b><span>Disaster relief, safety training and outreach</span></div></li>
+        <li><time>2010 to 2025</time><div><b>Pui Ching Middle School, Macau</b><span>IT, mathematics, physics, chemistry, commerce</span></div></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="band contact">
+  <div class="wrap">
+    <h2>Let's talk</h2>
+    <p>I'm open to research positions and internships in data science and machine learning. Email is the best way to reach me.</p>
+    <div class="links">
+      <span class="mail" id="addr">alvan.chui@example.com</span>
+      <button class="btn main" id="copy" type="button">Copy email</button>
+      <a class="btn" href="https://github.com/alvan-66">GitHub</a>
+      <a class="btn" href="https://www.linkedin.com/">LinkedIn</a>
+    </div>
+    <p class="small">Email and LinkedIn are placeholders until those accounts are set up.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap"><span>Alvan Chui · Seattle</span><a href="#top">Back to top</a></div>
+</footer>
+
+<script>
+{
+  const NS = 'http://www.w3.org/2000/svg';
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- Maze + BFS ---------- */
+  const mazeBox = document.getElementById('maze');
+  const mazeSvg = mazeBox.querySelector('svg');
+  let timer = null;
+
+  const rng = seed => () => (seed = seed * 16807 % 2147483647) / 2147483647;
+
+  const buildMaze = (cols, rows, seed) => {
+    const r = rng(seed);
+    const n = cols * rows;
+    const walls = Array.from({length: n}, () => [true, true, true, true]); // N E S W
+    const seen = new Array(n).fill(false);
+    const stack = [0];
+    seen[0] = true;
+    const dirs = [[0,-1,0,2],[1,0,1,3],[0,1,2,0],[-1,0,3,1]];
+    while (stack.length) {
+      const c = stack[stack.length - 1];
+      const x = c % cols, y = Math.floor(c / cols);
+      const opts = dirs.filter(([dx,dy]) => {
+        const nx = x + dx, ny = y + dy;
+        return nx >= 0 && ny >= 0 && nx < cols && ny < rows && !seen[ny * cols + nx];
+      });
+      if (!opts.length) { stack.pop(); continue; }
+      const [dx,dy,w,o] = opts[Math.floor(r() * opts.length)];
+      const nc = (y + dy) * cols + x + dx;
+      walls[c][w] = false; walls[nc][o] = false;
+      seen[nc] = true; stack.push(nc);
+    }
+    // open a few extra walls so BFS has real choices
+    for (let k = 0; k < Math.floor(n * 0.08); k++) {
+      const c = Math.floor(r() * n), x = c % cols, y = Math.floor(c / cols);
+      if (x < cols - 1) { walls[c][1] = false; walls[c + 1][3] = false; }
+      else if (y < rows - 1) { walls[c][2] = false; walls[c + cols][0] = false; }
+    }
+    return walls;
+  };
+
+  const bfs = (walls, cols, rows, start) => {
+    const dist = new Array(cols * rows).fill(-1), par = new Array(cols * rows).fill(-1);
+    const q = [start]; dist[start] = 0;
+    const step = [-cols, 1, cols, -1];
+    while (q.length) {
+      const c = q.shift();
+      for (let d = 0; d < 4; d++) {
+        if (walls[c][d]) continue;
+        const nc = c + step[d];
+        if (dist[nc] < 0) { dist[nc] = dist[c] + 1; par[nc] = c; q.push(nc); }
+      }
+    }
+    return {dist, par};
+  };
+
+  let seedCount = 7;
+  const drawMaze = () => {
+    clearInterval(timer);
+    const W = mazeBox.clientWidth, H = mazeBox.clientHeight;
+    if (!W || !H) return;
+    const cols = W < 520 ? 10 : W < 900 ? 16 : 22;
+    const pad = 18;
+    const cs = (W - pad * 2) / cols;
+    const rows = Math.max(5, Math.floor((H - pad * 2) / cs));
+    const ox = pad, oy = (H - rows * cs) / 2;
+    const walls = buildMaze(cols, rows, 1234 + seedCount * 977);
+    const start = 0;
+    const {dist, par} = bfs(walls, cols, rows, start);
+    let target = 0;
+    dist.forEach((d, i) => { if (d > dist[target]) target = i; });
+    const maxD = dist[target];
+
+    let cells = '', wallPath = '';
+    for (let i = 0; i < cols * rows; i++) {
+      const x = ox + (i % cols) * cs, y = oy + Math.floor(i / cols) * cs;
+      cells += `<rect data-i="${i}" x="${x + 1}" y="${y + 1}" width="${cs - 2}" height="${cs - 2}" rx="2" fill="transparent"/>`;
+      const w = walls[i];
+      if (w[0]) wallPath += `M${x} ${y}h${cs}`;
+      if (w[3]) wallPath += `M${x} ${y}v${cs}`;
+      if (w[1] && i % cols === cols - 1) wallPath += `M${x + cs} ${y}v${cs}`;
+      if (w[2] && Math.floor(i / cols) === rows - 1) wallPath += `M${x} ${y + cs}h${cs}`;
+    }
+    const route = [];
+    for (let c = target; c >= 0; c = par[c]) route.push(c);
+    const ctr = c => [ox + (c % cols + .5) * cs, oy + (Math.floor(c / cols) + .5) * cs];
+    const routeD = route.reverse().map((c, k) => (k ? 'L' : 'M') + ctr(c).join(' ')).join('');
+    const [sx, sy] = ctr(start), [tx, ty] = ctr(target);
+    const vs = cs * .5;
+
+    mazeSvg.innerHTML =
+      `<g id="cells">${cells}</g>` +
+      `<path d="${wallPath}" stroke="#e6f2ff" stroke-opacity=".9" stroke-width="2.5" stroke-linecap="square" fill="none"/>` +
+      `<path id="route" d="${routeD}" stroke="#ff5c8a" stroke-width="${Math.max(3, cs * .22)}" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0"/>` +
+      `<rect x="${tx - vs / 2}" y="${ty - vs / 2}" width="${vs}" height="${vs}" rx="3" fill="#ff5c8a" transform="rotate(45 ${tx} ${ty})"/>` +
+      `<circle cx="${sx}" cy="${sy}" r="${cs * .3}" fill="#fff" stroke="#0a2540" stroke-width="2"/>`;
+
+    const rects = mazeSvg.querySelectorAll('#cells rect');
+    const routeEl = mazeSvg.querySelector('#route');
+    const shade = d => {
+      const t = d / maxD;
+      return `color-mix(in srgb, #8fd3ff ${Math.round(58 - t * 36)}%, #0a2540)`;
+    };
+    const paint = upTo => {
+      rects.forEach(rc => {
+        const d = dist[+rc.dataset.i];
+        rc.setAttribute('fill', d >= 0 && d <= upTo ? shade(d) : 'transparent');
+      });
+      routeEl.setAttribute('opacity', upTo >= maxD ? '1' : '0');
+    };
+
+    if (reduce) { paint(maxD); return; }
+    let t = -4;
+    timer = setInterval(() => {
+      t++;
+      if (t >= 0 && t <= maxD) paint(t);
+      if (t > maxD + 45) { seedCount++; drawMaze(); }
+    }, 70);
+  };
+  const mazeRO = new ResizeObserver(() => drawMaze());
+  mazeRO.observe(mazeBox);
+
+  /* ---------- Flow-volume schematic ---------- */
+  const fvBox = document.getElementById('fv');
+  const fvSvg = fvBox.querySelector('svg');
+  const drawFV = () => {
+    const W = fvBox.clientWidth, H = fvBox.clientHeight;
+    if (!W || !H) return;
+    const m = {l: 44, r: 20, t: 26, b: 34};
+    const iw = W - m.l - m.r, ih = H - m.t - m.b;
+    const y0 = m.t + ih * .68; // zero-flow axis
+    const X = v => m.l + v * iw, Ye = f => y0 - f * (y0 - m.t), Yi = f => y0 + f * (m.t + ih - y0);
+    let exp = '', insp = '';
+    for (let k = 0; k <= 80; k++) {
+      const v = k / 80;
+      const f = v < .1 ? Math.sin(v / .1 * Math.PI / 2) : Math.max(0, 1 - (v - .1) / .9) ** 1.15;
+      exp += (k ? 'L' : 'M') + X(v).toFixed(1) + ' ' + Ye(f).toFixed(1);
+      const g = Math.sin(v * Math.PI) * .95;
+      insp += (k ? 'L' : 'M') + X(1 - v).toFixed(1) + ' ' + Yi(g).toFixed(1);
+    }
+    const narrow = W < 420;
+    fvSvg.innerHTML =
+      `<style>text{font:14px "Hanken Grotesk",system-ui,sans-serif;fill:#c3d6ea;paint-order:stroke;stroke:#0a2540;stroke-width:4px}</style>` +
+      `<line x1="${m.l}" x2="${W - m.r}" y1="${y0}" y2="${y0}" stroke="#24507d" stroke-width="1.5"/>` +
+      `<line x1="${m.l}" x2="${m.l}" y1="${m.t}" y2="${H - m.b}" stroke="#24507d" stroke-width="1.5"/>` +
+      `<path d="${insp}" fill="none" stroke="#8fd3ff" stroke-width="2.5" opacity=".55"/>` +
+      `<path d="${exp}" fill="none" stroke="#8fd3ff" stroke-width="3.5" stroke-linejoin="round"/>` +
+      `<circle cx="${X(.1)}" cy="${Ye(1)}" r="5" fill="#ff5c8a"/>` +
+      `<text x="${X(.1) + 12}" y="${Ye(1) + 5}">Peak flow</text>` +
+      `<text x="${W - m.r}" y="${H - 10}" text-anchor="end">Volume${narrow ? '' : ' exhaled'}</text>` +
+      `<text x="${m.l - 8}" y="${m.t - 8}" text-anchor="start">Flow</text>` +
+      `<text x="${X(.55)}" y="${Ye(.42) - 12}">Expiration</text>` +
+      `<text x="${X(.5)}" y="${Yi(.95) - 10}" text-anchor="middle">Inspiration</text>`;
+  };
+  const fvRO = new ResizeObserver(() => drawFV());
+  fvRO.observe(fvBox);
+
+  /* ---------- Copy email ---------- */
+  const btn = document.getElementById('copy');
+  btn.addEventListener('click', async () => {
+    const txt = document.getElementById('addr').textContent;
+    try { await navigator.clipboard.writeText(txt); btn.textContent = 'Copied'; }
+    catch (e) { btn.textContent = 'Select and copy'; }
+    setTimeout(() => { btn.textContent = 'Copy email'; }, 2000);
+  });
+}
+</script>
+</body>
+</html>
